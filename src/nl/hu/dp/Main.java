@@ -13,10 +13,15 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            getConnection();
-            ReizigerDAO rdao = new ReizigerDAOPsql(connection);
-            testReizigerDAO(rdao);
-            closeConnection();
+            // Voor P1 onderstaande testConnection() code gebruiken
+            testConnection();
+
+            //Voor P2 onderstaande code gebruiken
+//            getConnection();
+//            ReizigerDAO rdao = new ReizigerDAOPsql(connection);
+//            testReizigerDAO(rdao);
+//            closeConnection();
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -26,7 +31,7 @@ public class Main {
         //CHANGE PASSWORD "PRIVATE" BELOW TO YOUR OWN BEFORE USING
         if (connection == null) {
             String url =
-                    "jdbc:postgresql://localhost/ovchip?user=postgres&password=PASSWORD";
+                    "jdbc:postgresql://localhost/ovchip?user=postgres&password=Guppies@7";
             connection = DriverManager.getConnection(url);
         }
         return connection;
@@ -39,6 +44,51 @@ public class Main {
         }
     }
 
+    // Voor P1
+    private static void testConnection() throws SQLException {
+        //Open de connection to the database
+        getConnection();
+
+        //Normal statement instead of PreparedStatement
+        String query = "SELECT * FROM reiziger;";
+        Statement statement = connection.createStatement();
+        ResultSet set = statement.executeQuery(query);
+
+        System.out.println("Alle Reizigers:");
+
+        while (set != null && set.next()) {
+            StringBuilder str = new StringBuilder();
+            //#1:
+            str.append("#");
+            str.append(set.getString("reiziger_id"));
+            str.append(": ");
+
+            //G.
+            str.append(set.getString("voorletters"));
+            str.append(". ");
+
+            // van
+            if(set.getString("tussenvoegsel") != null) {
+                str.append(set.getString("tussenvoegsel"));
+                str.append(" ");
+            }
+
+            // Rijn (2002-09-17)
+            str.append(set.getString("achternaam"));
+            str.append(" (");
+            str.append(set.getString("geboortedatum"));
+            str.append(")");
+
+            System.out.println(str);
+        }
+
+        //Close the set, statement and connection
+        set.close();
+        statement.close();
+        closeConnection();
+    }
+
+    // Voor P2
     private static void testReizigerDAO(ReizigerDAO rdao) throws SQLException {
         System.out.println("\n---------- Test ReizigerDAO -------------");
 
