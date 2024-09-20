@@ -32,7 +32,7 @@ public class Main {
         //CHANGE PASSWORD "PRIVATE" BELOW TO YOUR OWN BEFORE USING
         if (connection == null) {
             String url =
-                    "jdbc:postgresql://localhost/ovchip?user=postgres&password=PRIVATE";
+                    "jdbc:postgresql://localhost/ovchip?user=postgres&password=Guppies@7";
             connection = DriverManager.getConnection(url);
         }
         return connection;
@@ -45,13 +45,13 @@ public class Main {
         }
     }
 
+    //Opdracht P2. ReizigerDAO
     private static void testReizigerDAO(ReizigerDAO rdao) throws SQLException {
         System.out.println("\n---------- Test ReizigerDAO -------------");
 
         // Haal alle reizigers op uit de database
-        List<Reiziger> reizigers = rdao.findAll();
         System.out.println("[Test] ReizigerDAO.findAll() geeft de volgende reizigers:");
-        for (Reiziger r : reizigers) {
+        for (Reiziger r : rdao.findAll()) {
             System.out.println(r);
         }
         System.out.println();
@@ -73,20 +73,17 @@ public class Main {
         // Maak een nieuwe reiziger aan en persisteer deze in de database
         String gbdatum = "1981-03-14";
         Reiziger sietske = new Reiziger(77, "S", "", "Boers", Date.valueOf(gbdatum));
-        System.out.print("[Test] Eerst " + reizigers.size() + " reizigers, na ReizigerDAO.save() ");
+        System.out.print("[Test] Eerst " + rdao.findAll().size() + " reizigers, na ReizigerDAO.save() ");
         rdao.save(sietske);
-        reizigers = rdao.findAll();
-        System.out.println(reizigers.size() + " reizigers\n");
+        System.out.println(rdao.findAll().size()  + " reizigers\n");
 
         // Delete een aangemaakte reiziger
         String gbdatum2 = "1981-03-14";
         Reiziger jan = new Reiziger(80, "J", "", "Kop", Date.valueOf(gbdatum2));
         rdao.save(jan);
-        reizigers = rdao.findAll();
-        System.out.print("[Test] Eerst " + reizigers.size() + " reizigers");
+        System.out.print("[Test] Eerst " + rdao.findAll().size()  + " reizigers");
         rdao.delete(jan);
-        reizigers = rdao.findAll();
-        System.out.print(" en na de delete " + reizigers.size() + " reizigers\n");
+        System.out.print(" en na de delete " + rdao.findAll().size()  + " reizigers\n");
 
         //Update een bestaande reiziger
         System.out.println();
@@ -100,8 +97,14 @@ public class Main {
         gevondenGebruiker = rdao.findById(77);
         System.out.println();
         System.out.println(gevondenGebruiker);
+
+        //Verwijder de reiziger die is aangemaakt voor de test
+        rdao.delete(sietske);
+        //Zet wijziging terug naar originele waarde
+        gevondenGebruiker.setVoorletters("S");
     }
 
+    //Opdracht P3. AdresDAO
     public static void testAdresDAO(AdresDAO adao, ReizigerDAO rdao) throws SQLException{
         System.out.println("\n---------- Test AdresDAO -------------");
 
@@ -141,5 +144,8 @@ public class Main {
         adao.delete(adresDelete);
         System.out.println("[Test] Verwijderd adres:");
         System.out.println(adao.findById(6));
+
+        //Verijder de reiziger die is aangemaakt voor de test
+        rdao.delete(nieuweReiziger);
     }
 }
