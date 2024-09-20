@@ -1,7 +1,6 @@
-package nl.hu.dp.sql;
+package nl.hu.dp.data;
 
 import nl.hu.dp.domain.Reiziger;
-import nl.hu.dp.interfaces.ReizigerDAO;
 
 import java.sql.*;
 import java.util.ArrayList;

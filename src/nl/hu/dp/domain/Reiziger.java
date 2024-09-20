@@ -7,6 +7,8 @@ public class Reiziger {
     private String achternaam;
     private java.sql.Date geboortedatum;
 
+    private Adres adres;
+
     public Reiziger() {}
 
     public Reiziger(int id, String voorletters, String tussenvoegsel, String achternaam, java.sql.Date geboortedatum) {
@@ -55,6 +57,14 @@ public class Reiziger {
 
     public void setGeboortedatum(java.sql.Date geboortedatum) {
         this.geboortedatum = geboortedatum;
+    }
+
+    public Adres getAdres() {
+        return adres;
+    }
+
+    public void setAdres(Adres adres) {
+        this.adres = adres;
     }
 
     public String toString() {

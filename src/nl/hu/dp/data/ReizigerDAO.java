@@ -1,4 +1,4 @@
-package nl.hu.dp.interfaces;
+package nl.hu.dp.data;
 
 import nl.hu.dp.domain.Reiziger;
 

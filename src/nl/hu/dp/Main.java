@@ -1,8 +1,11 @@
 package nl.hu.dp;
 
+import nl.hu.dp.data.AdresDAO;
+import nl.hu.dp.data.AdresDAOPsql;
+import nl.hu.dp.data.ReizigerDAOPsql;
+import nl.hu.dp.domain.Adres;
 import nl.hu.dp.domain.Reiziger;
-import nl.hu.dp.interfaces.ReizigerDAO;
-import nl.hu.dp.sql.ReizigerDAOPsql;
+import nl.hu.dp.data.ReizigerDAO;
 
 import java.sql.Connection;
 import java.sql.*;
@@ -15,7 +18,10 @@ public class Main {
         try {
             getConnection();
             ReizigerDAO rdao = new ReizigerDAOPsql(connection);
-            testReizigerDAO(rdao);
+//            testReizigerDAO(rdao);
+
+            AdresDAO adao = new AdresDAOPsql(connection);
+            testAdresDAO(adao, rdao);
             closeConnection();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -26,7 +32,7 @@ public class Main {
         //CHANGE PASSWORD "PRIVATE" BELOW TO YOUR OWN BEFORE USING
         if (connection == null) {
             String url =
-                    "jdbc:postgresql://localhost/ovchip?user=postgres&password=PASSWORD";
+                    "jdbc:postgresql://localhost/ovchip?user=postgres&password=PRIVATE";
             connection = DriverManager.getConnection(url);
         }
         return connection;
@@ -94,5 +100,46 @@ public class Main {
         gevondenGebruiker = rdao.findById(77);
         System.out.println();
         System.out.println(gevondenGebruiker);
+    }
+
+    public static void testAdresDAO(AdresDAO adao, ReizigerDAO rdao) throws SQLException{
+        System.out.println("\n---------- Test AdresDAO -------------");
+
+        System.out.println("[Test] AdresDAO.findAll() geeft de volgende adressen:");
+        List<Adres> adressen = adao.findAll();
+        for(Adres adres : adressen){
+            System.out.println(adres);
+        }
+
+        System.out.println("[Test] AdresDAO.findById(1) geeft het volgende adres:");
+        Adres adres = adao.findById(1);
+        System.out.println(adres);
+
+        System.out.println("[Test] AdresDAO.findByReiziger(Reiziger) geeft het volgende adres:");
+        Reiziger reiziger = rdao.findById(2);
+        Adres adresReiziger = adao.findByReiziger(reiziger);
+        System.out.println(adresReiziger);
+
+        System.out.println("[Test] AdresDAO.save()");
+        Reiziger nieuweReiziger = new Reiziger(6, "J", "", "Kop", Date.valueOf("1981-03-14"));
+        Adres nieuwAdres = new Adres(6, "1234AB", "1", "Straatweg", "Utrecht", nieuweReiziger);
+        rdao.save(nieuweReiziger);
+        adao.save(nieuwAdres);
+        System.out.println("[Test] Opgeslagen adres:");
+        System.out.println(adao.findById(6));
+
+        System.out.println("[Test] AdresDAO.update()");
+        Adres adresUpdate = adao.findById(6);
+        adresUpdate.setPostcode("2314YE");
+        adao.update(adresUpdate);
+        System.out.println("[Test] Aangepast adres:");
+        System.out.println(adao.findById(6));
+
+        System.out.println("[Test] AdresDAO.delete()");
+        Adres adresDelete = adao.findById(6);
+        System.out.println(adresDelete);
+        adao.delete(adresDelete);
+        System.out.println("[Test] Verwijderd adres:");
+        System.out.println(adao.findById(6));
     }
 }
