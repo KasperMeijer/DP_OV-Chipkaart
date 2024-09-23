@@ -1,14 +1,13 @@
 package nl.hu.dp;
 
-import nl.hu.dp.data.AdresDAO;
-import nl.hu.dp.data.AdresDAOPsql;
-import nl.hu.dp.data.ReizigerDAOPsql;
+import nl.hu.dp.data.*;
 import nl.hu.dp.domain.Adres;
+import nl.hu.dp.domain.OVChipkaart;
 import nl.hu.dp.domain.Reiziger;
-import nl.hu.dp.data.ReizigerDAO;
 
 import java.sql.Connection;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.List;
 
 public class Main {
@@ -18,10 +17,13 @@ public class Main {
         try {
             getConnection();
             ReizigerDAO rdao = new ReizigerDAOPsql(connection);
-//            testReizigerDAO(rdao);
+            //testReizigerDAO(rdao);
 
-            AdresDAO adao = new AdresDAOPsql(connection);
-            testAdresDAO(adao, rdao);
+            //AdresDAO adao = new AdresDAOPsql(connection);
+            //testAdresDAO(adao, rdao);
+
+            OVChipkaartDAO ovdao = new OVChipkaartDAOPsql(connection);
+            testOVChipkaartDAO(ovdao, rdao);
             closeConnection();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -147,5 +149,49 @@ public class Main {
 
         //Verijder de reiziger die is aangemaakt voor de test
         rdao.delete(nieuweReiziger);
+    }
+
+    //Opdracht P4. OVChipkaartDAO
+    public static void testOVChipkaartDAO(OVChipkaartDAO ovdao, ReizigerDAO rdao) throws SQLException{
+        System.out.println("\n---------- Test OVChipkaartDAO -------------");
+
+        System.out.println("[Test] OVChipkaartDAO.findAll() geeft de volgende ov-chipkaarten:");
+        List<OVChipkaart> ovChipkaarten = ovdao.findAll();
+        for(OVChipkaart ovChipkaart : ovChipkaarten){
+            System.out.println(ovChipkaart);
+        }
+
+        System.out.println("[Test] OVChipkaartDAO.findById(35283) geeft de volgende ov-chipkaart:");
+        OVChipkaart ovChipkaart = ovdao.findById(35283);
+        System.out.println(ovChipkaart);
+
+        System.out.println("[Test] OVChipkaartDAO.findByReiziger(Reiziger) geeft de volgende ov-chipkaarten:");
+        Reiziger reiziger = rdao.findById(2);
+        List<OVChipkaart> ovChipkaartenReiziger = ovdao.findByReiziger(reiziger);
+        for(OVChipkaart ovChipkaartReiziger : ovChipkaartenReiziger){
+            System.out.println(ovChipkaartReiziger);
+        }
+
+        System.out.println("[Test] OVChipkaartDAO.save()");
+        Reiziger nieuweReiziger = new Reiziger(6, "J", "", "Kop", Date.valueOf("1981-03-14"));
+        rdao.save(nieuweReiziger);
+        OVChipkaart nieuweOVChipkaart = new OVChipkaart(35284, LocalDate.of(2021, 2, 2), 2, 25.00, nieuweReiziger);
+        ovdao.save(nieuweOVChipkaart);
+        System.out.println("[Test] Opgeslagen ov-chipkaart:");
+        System.out.println(ovdao.findById(35284));
+
+        System.out.println("[Test] OVChipkaartDAO.update()");
+        OVChipkaart ovChipkaartUpdate = ovdao.findById(35284);
+        ovChipkaartUpdate.setSaldo(30.00);
+        ovdao.update(ovChipkaartUpdate);
+        System.out.println("[Test] Aangepaste ov-chipkaart:");
+        System.out.println(ovdao.findById(35284));
+
+        System.out.println("[Test] OVChipkaartDAO.delete()");
+        OVChipkaart ovChipkaartDelete = ovdao.findById(35284);
+        System.out.println(ovChipkaartDelete);
+        ovdao.delete(ovChipkaartDelete);
+        System.out.println("[Test] Verwijderde ov-chipkaart:");
+        System.out.println(ovdao.findById(35284));
     }
 }
