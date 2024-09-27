@@ -2,9 +2,11 @@ package nl.hu.dp.data;
 
 import nl.hu.dp.domain.Adres;
 import nl.hu.dp.domain.OVChipkaart;
+import nl.hu.dp.domain.Product;
 import nl.hu.dp.domain.Reiziger;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,27 +15,45 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO {
 
     private ReizigerDAO ReizigerDAOPsql;
 
-    public OVChipkaartDAOPsql(Connection conn){
+    public OVChipkaartDAOPsql(Connection conn, ReizigerDAO rdao){
         this.connection = conn;
-        this.ReizigerDAOPsql = new ReizigerDAOPsql(conn);
+        this.ReizigerDAOPsql = rdao;
     }
 
     @Override
     public boolean save(OVChipkaart ovChipkaart) throws SQLException {
         if(findById(ovChipkaart.getKaart_nummer()) == null) {
-            String q = "INSERT INTO ov_chipkaart (kaart_nummer, geldig_tot, klasse, saldo, reiziger_id) " +
-                    "VALUES (?, ?, ?, ?, ?)";
-            try(PreparedStatement pst = connection.prepareStatement(q)){
+            try(PreparedStatement pst = connection.prepareStatement(
+                    "INSERT INTO ov_chipkaart (kaart_nummer, geldig_tot, klasse, saldo, reiziger_id) " +
+                            "VALUES (?, ?, ?, ?, ?)"
+            )){
                 pst.setInt(1, ovChipkaart.getKaart_nummer());
                 pst.setDate(2, Date.valueOf(ovChipkaart.getGeldig_tot()));
                 pst.setInt(3, ovChipkaart.getKlasse());
                 pst.setDouble(4, ovChipkaart.getSaldo());
                 pst.setInt(5, ovChipkaart.getReiziger().getId());
-                pst.executeQuery();
-                return true;
+                pst.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
-        return false;
+
+        // Saves Link
+        for(Product product : ovChipkaart.getProducten()) {
+            try (PreparedStatement pst = connection.prepareStatement(
+                    "INSERT INTO ov_chipkaart_product (kaart_nummer, product_nummer, status, last_update) " +
+                            "VALUES (?, ?, ?, ?)"
+            )) {
+                pst.setInt(1, ovChipkaart.getKaart_nummer());
+                pst.setInt(2, product.getProduct_nummer());
+                pst.setString(3, "actief");
+                pst.setDate(4, Date.valueOf(LocalDate.now()));
+                pst.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return true;
     }
 
     @Override

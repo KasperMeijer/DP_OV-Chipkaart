@@ -3,6 +3,7 @@ package nl.hu.dp;
 import nl.hu.dp.data.*;
 import nl.hu.dp.domain.Adres;
 import nl.hu.dp.domain.OVChipkaart;
+import nl.hu.dp.domain.Product;
 import nl.hu.dp.domain.Reiziger;
 
 import java.sql.Connection;
@@ -17,13 +18,9 @@ public class Main {
         try {
             getConnection();
             ReizigerDAO rdao = new ReizigerDAOPsql(connection);
-            //testReizigerDAO(rdao);
-
-            //AdresDAO adao = new AdresDAOPsql(connection);
-            //testAdresDAO(adao, rdao);
-
-            OVChipkaartDAO ovdao = new OVChipkaartDAOPsql(connection);
-            testOVChipkaartDAO(ovdao, rdao);
+            OVChipkaartDAO ovdao = new OVChipkaartDAOPsql(connection, rdao);
+            ProductDAO pdao = new ProductDAOsql(connection, ovdao);
+            testProductDAO(pdao, ovdao, rdao);
             closeConnection();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -193,5 +190,40 @@ public class Main {
         ovdao.delete(ovChipkaartDelete);
         System.out.println("[Test] Verwijderde ov-chipkaart:");
         System.out.println(ovdao.findById(35284));
+    }
+
+    //Opdracht P5. ProductDAO (ManyToMany)
+    public static void testProductDAO(ProductDAO pdao, OVChipkaartDAO ovdao, ReizigerDAO rdao) throws SQLException {
+        System.out.println("\n---------- Test ProductDAO -------------");
+
+        Product product = new Product(9, "Test", "Test product", 10.00);
+        Product product2 = new Product(10, "Test", "Test product", 10.00);
+        OVChipkaart ovChipkaart = new OVChipkaart(123456, LocalDate.of(2021, 2, 2), 2, 25.00, rdao.findById(2));
+
+        product.addOVChipkaart(ovChipkaart);
+        product2.addOVChipkaart(ovChipkaart);
+        ovChipkaart.addProduct(product);
+        ovChipkaart.addProduct(product2);
+
+        pdao.save(product);
+        pdao.save(product2);
+
+        System.out.println("[Test] ProductDAO.findById(9) op nieuw product geeft:");
+        System.out.println(pdao.findById(9));
+
+        System.out.println("[Test] ProductDAO.findByOVChipkaart(OVChipkaart) geeft:");
+        System.out.println(pdao.findByOVChipkaart(ovChipkaart));
+
+        System.out.println("[Test] ProductDAO.findAll() geeft de volgende producten:");
+        System.out.println(pdao.findAll());
+
+        System.out.println("[Test] ProductDAO.update(product) geeft de volgende producten:");
+        product.setNaam("ProductNaamAangepast");
+        pdao.update(product);
+        System.out.println(pdao.findById(9));
+
+        pdao.delete(product);
+        pdao.delete(product2);
+        ovdao.delete(ovChipkaart);
     }
 }

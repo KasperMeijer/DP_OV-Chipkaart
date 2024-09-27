@@ -1,6 +1,8 @@
 package nl.hu.dp.domain;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OVChipkaart {
     int kaart_nummer;
@@ -8,7 +10,9 @@ public class OVChipkaart {
     int klasse;
     double saldo;
 
-    Reiziger reiziger;
+    private Reiziger reiziger;
+
+    private List<Product> producten = new ArrayList<>();
 
     public OVChipkaart(int kaart_nummer, LocalDate geldig_tot, int klasse, double saldo, Reiziger reiziger) {
         this.kaart_nummer = kaart_nummer;
@@ -56,6 +60,18 @@ public class OVChipkaart {
 
     public void setReiziger(Reiziger reiziger) {
         this.reiziger = reiziger;
+    }
+
+    public List<Product> getProducten() {
+        return producten;
+    }
+
+    public void addProduct(Product product) {
+        producten.add(product);
+    }
+
+    public void removeProduct(Product product) {
+        producten.remove(product);
     }
 
     public String toString(){
