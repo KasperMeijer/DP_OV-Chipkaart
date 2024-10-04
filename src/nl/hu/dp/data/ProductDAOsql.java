@@ -1,9 +1,7 @@
 package nl.hu.dp.data;
 
-import nl.hu.dp.domain.Adres;
 import nl.hu.dp.domain.OVChipkaart;
 import nl.hu.dp.domain.Product;
-import nl.hu.dp.domain.Reiziger;
 
 import java.sql.*;
 import java.time.LocalDate;
