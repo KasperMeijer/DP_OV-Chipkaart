@@ -31,7 +31,7 @@ public class Main {
         //CHANGE PASSWORD "PRIVATE" BELOW TO YOUR OWN BEFORE USING
         if (connection == null) {
             String url =
-                    "jdbc:postgresql://localhost/ovchip?user=postgres&password=Guppies@7";
+                    "jdbc:postgresql://localhost/ovchip?user=postgres&password=postgres";
             connection = DriverManager.getConnection(url);
         }
         return connection;
